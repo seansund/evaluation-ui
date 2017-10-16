@@ -26,7 +26,7 @@
     "test:old": "mocha --require ts-node/register --watch --watch-extensions js,ts \"src/**/*.spec.js\"",
     "lint": "tslint ./src/**/*.ts -t verbose",
     "watch": "npm-watch",
-    "clean:tsout": "rimraf src/**/*.js*"
+    "clean:tsout": "rimraf src/*.js.map src/*.js"
   },
   "keywords": [],
   "author": "",
