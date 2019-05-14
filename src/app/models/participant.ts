@@ -41,7 +41,18 @@ export var ParticipantSchema: Schema = new Schema({
   sizing: { type: SizingSchema },
   evaluation: { type: EvaluationSchema }
 });
+
+export function preSave() {
+  let status: Status = Status.Incomplete;
+  if (this.sizing) {
+    if (this.type === Type.B && this.evaluation || this.type === Type.C) {
+      status = Status.Complete;
+    }
+  }
+  this.status = status;
+};
 ParticipantSchema.pre('save', function(next) {
+  preSave.call(this);
 
   next();
 });

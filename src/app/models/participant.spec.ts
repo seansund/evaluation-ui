@@ -2,6 +2,7 @@ require('should');
 import { expect } from 'chai';
 import { IParticipantModel, Participant } from './participant';
 import { Size } from '../interfaces/sizing';
+import { replace, when, verify, reset } from 'testdouble';
 
 describe('Participant Model', () => {
   it('canary verifies test infrastructure', () => {
@@ -39,7 +40,7 @@ describe('Participant Model', () => {
       });
     });
 
-    it('should require "firstName"', () => {
+    it('should require "lastName"', () => {
       return participant.validate().then(noopSuccess, (error: any) => {
         error.errors['lastName'].message.should.equal('Path `lastName` is required.');
       });
@@ -57,17 +58,27 @@ describe('Participant Model', () => {
       });
     });
 
-    it('should have undefined sizing by default', () => {
-      (!!participant.sizing).should.be.false('boolean');
-    });
-
-    it('should allow sizing to be added after initialization', () => {
-      participant.sizing = {
-        topSize: Size.AL,
-        bottomSize: Size.YL,
-        shirtSize: Size.YL,
-        height: 60
-      };
+    describe('sizing', () => {
+      it('should have undefined sizing by default', () => {
+        (!!participant.sizing).should.be.false('boolean');
+      });
+      it('should not require "sizing"', () => {
+        return participant.validate().then(noopSuccess, (error: any) => {
+          (!!error.errors['sizing']).should.be.false('boolean');
+        });
+      });
+      it('should allow sizing to be added after initialization', () => {
+        let tmp: Size;
+        participant.sizing = {
+          topSize: tmp,
+          shirtSize: Size.YL,
+          bottomSize: Size.AL,
+          height: 60
+        };
+        return participant.validate().then(noopSuccess, (error: any) => {
+          error.errors['sizing'].message.should.equal('Validation failed: topSize: Path `topSize` is required.');
+        });
+      });
     });
   });
 });
